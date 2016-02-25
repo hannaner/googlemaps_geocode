@@ -1,8 +1,99 @@
 <html>
-  <head>
-    <link rel="stylesheet" href="/static/css/styles.css" type="text/css">
-  </head>
-  <body>
-    The best place to start is the "WelcomeController.py" file in app/controllers.
-  </body>
+<head>
+	<style>
+		* {
+			font-family: sans-serif;
+		}
+		#map{
+			width: 800px;
+			height:600px;
+		}
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js"></script>
+  <script>
+
+    function initialize(){
+      var mapCanvas = document.getElementById('map');
+      // var bounds = new google.maps.LatLngBounds();
+      var mapOptions = {
+        center: new google.maps.LatLng(37.529468, -122.063084),
+        zoom: 9,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      }
+      var map = new google.maps.Map(mapCanvas, mapOptions);
+
+
+
+		$(document).ready(function(){
+	  	// 	$('form').submit(function(res){
+	    $.get("/view", function(res){
+	    	// console.log(res);
+	    	//console.log(results.length);
+	    	results=res.ping;
+	    	var myLatLng=[];
+
+	    	var infoWindowContent= [];
+	    	
+	      for (var i=1; i<results.length; i++){
+					var lat = results[i].lat;
+			  	var longitude = results[i].lng;
+					var tempLatlong={lat:parseFloat(lat),lng:parseFloat(longitude)};
+
+			  	myLatLng.push(tempLatlong);
+			  	// console.log(myLatLng);
+					
+					//extend boundaries of map to fit points on page
+			  	// var position = new google.maps.LatLng(myLatLng[i-1]);
+			  	// bounds.extend(position);
+
+
+					// ''' creating empty string to append each windows content'''
+			  	
+				  var marker = new google.maps.Marker({
+				  	position: myLatLng[i-1],
+				    map: map,
+				    title: "Points"
+				  });
+				  // map.fitBounds(bounds)
+
+			  	var contentString = '<div id="content">' + '<p>hello</p>' + '</div>'
+				  var infowindow = new google.maps.InfoWindow({
+				  	content: contentString
+				  });
+
+				  marker.addListener('click', function(){
+				  	infowindow.open(map, marker);
+				  });
+
+
+				  // map.fitBounds(bounds);
+
+
+			  }
+			}, 'json');
+			});
+	}
+	   google.maps.event.addDomListener(window, 'load', initialize);
+
+  </script>
+
+
+</head>
+<body>
+	<div id="container">
+		<h1>Google Map Test</h1>
+		<div id="map">
+		</div>
+		<div id='test_form'>
+			<form action='testform' method='post'>
+				<input type='text' name='street' placeholder='street'>
+				<input type='text' name='city' placeholder='city'>
+				<input type='text' name='state' placeholder='state'>
+				<input type='text' name='zip' placeholder='zip'>
+				<input type='submit' name='submit' value='submit'>
+			</form>
+		</div>
+	</div>
+</body>
 </html>
